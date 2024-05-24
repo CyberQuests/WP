@@ -1,0 +1,159 @@
+# BEGIN WordPress
+<IfModule mod_rewrite.c>
+	  # 啟用 Rewrite 引擎
+    RewriteEngine On
+	  # 設置 Rewrite 的路徑
+    RewriteBase /
+	  # 排除 index.php
+    RewriteRule ^index\.php$ - [L]
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+	  # 如果請求的文件不存在	
+    RewriteCond %{REQUEST_FILENAME} !-f
+	  # 如果請求的目錄不存在
+    RewriteCond %{REQUEST_FILENAME} !-d
+	  # 重寫所有其他請求到 index.php
+    RewriteRule . /index.php [L]
+</IfModule>
+# END WordPress
+
+# BEGIN WP Rocket v3.12.0.2
+# 設置為 UTF-8 為預設的編碼
+AddDefaultCharset UTF-8
+
+# 強制特定檔案格式使用 UTF-8 編碼，避免顯示亂碼
+<IfModule mod_mime.c>
+    AddCharset UTF-8 .atom .css .js .json .rss .vtt .xml
+</IfModule>
+
+# 移除 ETag Header，減少 HTTP 請求的大小並提高加載速度
+<IfModule mod_headers.c>
+    Header unset ETag
+</IfModule>
+# 設定檔案 ETag 為 None，以便與舊版瀏覽器和代理服務器兼容
+FileETag None
+
+# 為特定檔案設置 Cache-Control Header
+<IfModule mod_alias.c>
+    <FilesMatch "\.(html|htm|rtf|rtx|txt|xsd|xsl|xml)$">
+        <IfModule mod_headers.c>
+			# 設置 X-Powered-By Header
+            Header set X-Powered-By "WP Rocket/3.12.0.2"
+			# 移除 Pragma Header，避免過時的緩存控制
+            Header unset Pragma
+			# 設置 Cache-Control Header 為 public
+            Header append Cache-Control "public"
+			# 移除 Last-Modified Header，防止因文件修改日期導致的頻繁刷新
+            Header unset Last-Modified
+        </IfModule>
+    </FilesMatch>
+
+    <FilesMatch "\.(css|htc|js|asf|asx|wax|wmv|wmx|avi|bmp|class|divx|doc|docx|eot|exe|gif|gz|gzip|ico|jpg|jpeg|jpe|json|mdb|mid|midi|mov|qt|mp3|m4a|mp4|m4v|mpeg|mpg|mpe|mpp|otf|odb|odc|odf|odg|odp|ods|odt|ogg|pdf|png|pot|pps|ppt|pptx|ra|ram|svg|svgz|swf|tar|tif|tiff|ttf|ttc|wav|wma|wri|xla|xls|xlsx|xlt|xlw|zip)$">
+        <IfModule mod_headers.c>
+			# 移除 Pragma Header，避免過時的緩存控制
+            Header unset Pragma
+			# 設置 Cache-Control Header 為 public
+            Header append Cache-Control "public"
+        </IfModule>
+    </FilesMatch>
+</IfModule>
+
+# 為 AVIF 和 AVIF Sequence 圖檔設置 MIME 類型
+<IfModule mod_mime.c>
+    AddType image/avif avif
+    AddType image/avif-sequence avifs
+	# 為 WebP 圖檔設置 MIME 類型
+	AddType image/webp webp
+</IfModule>
+
+# 設置檔案過期時間以優化緩存
+<IfModule mod_expires.c>
+    ExpiresActive on
+	# 預設所有檔案的過期時間為一個月
+    ExpiresDefault "access plus 1 month"
+	# 為不同的檔案類型設置不同的過期時間
+    ExpiresByType text/cache-manifest "access plus 0 seconds"
+    ExpiresByType text/html "access plus 0 seconds"
+    ExpiresByType text/xml "access plus 0 seconds"
+    ExpiresByType application/xml "access plus 0 seconds"
+    ExpiresByType application/json "access plus 0 seconds"
+    ExpiresByType application/rss+xml "access plus 1 hour"
+    ExpiresByType application/atom+xml "access plus 1 hour"
+    ExpiresByType image/x-icon "access plus 1 week"
+    ExpiresByType image/gif "access plus 4 months"
+    ExpiresByType image/png "access plus 4 months"
+    ExpiresByType image/jpeg "access plus 4 months"
+    ExpiresByType image/webp "access plus 4 months"
+    ExpiresByType video/ogg "access plus 4 months"
+    ExpiresByType audio/ogg "access plus 4 months"
+    ExpiresByType video/mp4 "access plus 4 months"
+    ExpiresByType video/webm "access plus 4 months"
+    ExpiresByType image/avif "access plus 4 months"
+    ExpiresByType image/avif-sequence "access plus 4 months"
+    ExpiresByType text/x-component "access plus 1 month"
+    ExpiresByType font/ttf "access plus 4 months"
+    ExpiresByType font/otf "access plus 4 months"
+    ExpiresByType font/woff "access plus 4 months"
+    ExpiresByType font/woff2 "access plus 4 months"
+    ExpiresByType image/svg+xml "access plus 4 months"
+    ExpiresByType application/vnd.ms-fontobject "access plus 1 month"
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+</IfModule>
+
+# 啟用 Gzip 壓縮，減少檔案大小並提高加載速度
+<IfModule mod_deflate.c>
+    # 壓縮特定的 MIME 類型以減少檔案大小
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
+    AddOutputFilterByType DEFLATE application/x-font
+    AddOutputFilterByType DEFLATE application/x-font-opentype
+    AddOutputFilterByType DEFLATE application/x-font-otf
+    AddOutputFilterByType DEFLATE application/x-font-truetype
+    AddOutputFilterByType DEFLATE application/x-font-ttf
+    AddOutputFilterByType DEFLATE application/x-javascript
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE font/opentype
+    AddOutputFilterByType DEFLATE font/otf
+    AddOutputFilterByType DEFLATE font/ttf
+    AddOutputFilterByType DEFLATE image/svg+xml
+    AddOutputFilterByType DEFLATE image/x-icon
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/xml
+
+    # 處理特定瀏覽器的壓縮問題（僅針對非常舊的瀏覽器）
+    BrowserMatch ^Mozilla/4 gzip-only-text/html
+    BrowserMatch ^Mozilla/4\.0[678] no-gzip
+    BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+    Header append Vary User-Agent
+</IfModule>
+
+<IfModule mod_headers.c>
+	# 設置嚴格傳輸安全策略 (HSTS)，防止中間人攻擊
+    Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+	# 禁止 MIME 類型嗅探
+    Header set X-Content-Type-Options nosniff
+	# 設置引用策略
+    Header set Referrer-Policy "same-origin"
+	# 設置功能策略
+    Header set Feature-Policy "geolocation 'self'"
+	# 設置 XSS 防護，防止跨站腳本攻擊
+    Header set X-XSS-Protection "1; mode=block"
+	# 設置權限策略
+    Header set Permissions-Policy: geolocation=(), camera=()
+	# 編輯 Set-Cookie Header 以設置 HttpOnly、Secure 和 SameSite 屬性
+    Header always edit Set-Cookie ^(.*)$ "$1; HttpOnly; Secure; SameSite=None"
+	# 添加 X-Frame-Options Header
+    Header append X-FRAME-OPTIONS "SAMEORIGIN"
+	# 添加 Vary: Accept-Encoding Header
+    Header append Vary: Accept-Encoding
+	# 設置允許跨域資源共享 (CORS) 
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET,POST,OPTIONS,DELETE,PUT"
+    Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+</IfModule>
+# END WP Rocket
